@@ -54,6 +54,20 @@ MainTab:AddButton({
     end
 })
 
+MainTab:AddButton({
+    Name = "Lynacy hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/1c1979f776d3e81869cf5f49f91900a7.lua"))()
+    end
+})
+
+MainTab:AddButton({
+    Name = "Than hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/thantzy/thanhub/refs/heads/main/thanv1"))()
+    end
+})
+
 -- Local Player Section
 local LocalTab = Window:MakeTab({
     Name = "Local Player",
