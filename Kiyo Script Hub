@@ -8,19 +8,17 @@ local Window = OrionLib:MakeWindow({
     ConfigFolder = "NatHubConfig"
 })
 
--- Create a tab
+-- Create main tab
 local MainTab = Window:MakeTab({
     Name = "Grow a Garden",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
 })
 
--- Add a section
-local Section = MainTab:AddSection({
+MainTab:AddSection({
     Name = "Scripts"
 })
 
--- Add NatHub script button
 MainTab:AddButton({
     Name = "NatHub",
     Callback = function()
@@ -28,7 +26,6 @@ MainTab:AddButton({
     end
 })
 
--- Add Zekrom Hub script button
 MainTab:AddButton({
     Name = "Speed hub",
     Callback = function()
@@ -39,15 +36,110 @@ MainTab:AddButton({
 MainTab:AddButton({
     Name = "Lunor hub",
     Callback = function()
-  loadstring(game:HttpGet('https://lunor.dev/loader'))()
-  end
+        loadstring(game:HttpGet('https://lunor.dev/loader'))()
+    end
 })
 
 MainTab:AddButton({
     Name = "No Lag hub",
     Callback = function()
-  loadstring(game:HttpGet("https://rawscripts.net/raw/Grow-a-Garden-NoLag-Hub-no-key-38699"))()
-  end
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Grow-a-Garden-NoLag-Hub-no-key-38699"))()
+    end
 })
+
+MainTab:AddButton({
+    Name = "ThunderZ hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua"))()
+    end
+})
+
+-- Local Player Section
+local LocalTab = Window:MakeTab({
+    Name = "Local Player",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+LocalTab:AddSection({
+    Name = "Player Modifiers"
+})
+
+-- Walk Speed Changer
+LocalTab:AddTextbox({
+    Name = "Walk Speed",
+    Default = "16",
+    TextDisappear = true,
+    Callback = function(Value)
+        local speed = tonumber(Value)
+        if speed and game.Players.LocalPlayer.Character then
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speed
+        end
+    end
+})
+
+-- Jump Power Changer
+LocalTab:AddTextbox({
+    Name = "Jump Power",
+    Default = "50",
+    TextDisappear = true,
+    Callback = function(Value)
+        local jumpPower = tonumber(Value)
+        if jumpPower and game.Players.LocalPlayer.Character then
+            game.Players.LocalPlayer.Character.Humanoid.JumpPower = jumpPower
+        end
+    end
+})
+
+-- No Clip Toggle
+local noclipEnabled = false
+local RunService = game:GetService("RunService")
+
+RunService.Stepped:Connect(function()
+    if noclipEnabled and game.Players.LocalPlayer.Character then
+        for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+LocalTab:AddToggle({
+    Name = "No Clip",
+    Default = false,
+    Callback = function(Value)
+        noclipEnabled = Value
+        OrionLib:MakeNotification({
+            Name = "No Clip",
+            Content = Value and "Enabled" or "Disabled",
+            Time = 3
+        })
+    end
+})
+
+-- Infinite Jump Toggle
+local infJumpEnabled = false
+local UserInputService = game:GetService("UserInputService")
+
+UserInputService.JumpRequest:Connect(function()
+    if infJumpEnabled and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+        game.Players.LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
+LocalTab:AddToggle({
+    Name = "Infinite Jump",
+    Default = false,
+    Callback = function(Value)
+        infJumpEnabled = Value
+        OrionLib:MakeNotification({
+            Name = "Infinite Jump",
+            Content = Value and "Enabled" or "Disabled",
+            Time = 3
+        })
+    end
+})
+
 -- Initialize the UI
 OrionLib:Init()
