@@ -1,0 +1,53 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
+
+-- Create the main window
+local Window = OrionLib:MakeWindow({
+    Name = "Kiyo Hub",
+    HidePremium = false,
+    SaveConfig = false,
+    ConfigFolder = "NatHubConfig"
+})
+
+-- Create a tab
+local MainTab = Window:MakeTab({
+    Name = "Grow a Garden",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+})
+
+-- Add a section
+local Section = MainTab:AddSection({
+    Name = "Scripts"
+})
+
+-- Add NatHub script button
+MainTab:AddButton({
+    Name = "NatHub",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"))()
+    end
+})
+
+-- Add Zekrom Hub script button
+MainTab:AddButton({
+    Name = "Speed hub",
+    Callback = function()
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+    end
+})
+
+MainTab:AddButton({
+    Name = "Lunor hub",
+    Callback = function()
+  loadstring(game:HttpGet('https://lunor.dev/loader'))()
+  end
+})
+
+MainTab:AddButton({
+    Name = "No Lag hub",
+    Callback = function()
+  loadstring(game:HttpGet("https://rawscripts.net/raw/Grow-a-Garden-NoLag-Hub-no-key-38699"))()
+  end
+})
+-- Initialize the UI
+OrionLib:Init()
