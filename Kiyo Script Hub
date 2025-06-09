@@ -4,23 +4,19 @@ local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jen
 local Window = OrionLib:MakeWindow({
     Name = "Kiyo Hub",
     HidePremium = false,
-    SaveConfig = false,
-    ConfigFolder = "NatHubConfig"
+    SaveConfig = true,
+    ConfigFolder = "KiyoHubConfig"
 })
 
--- Create a tab
+-- Grow a Garden Tab
 local MainTab = Window:MakeTab({
     Name = "Grow a Garden",
     Icon = "rbxassetid://4483345998",
     PremiumOnly = false
 })
 
--- Add a section
-local Section = MainTab:AddSection({
-    Name = "Scripts"
-})
+MainTab:AddSection({ Name = "Scripts" })
 
--- NatHub button
 MainTab:AddButton({
     Name = "NatHub",
     Callback = function()
@@ -28,15 +24,13 @@ MainTab:AddButton({
     end
 })
 
--- Speed Hub button
 MainTab:AddButton({
     Name = "Speed hub",
     Callback = function()
-       loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
     end
 })
 
--- Lunor Hub button
 MainTab:AddButton({
     Name = "Lunor hub",
     Callback = function()
@@ -44,7 +38,6 @@ MainTab:AddButton({
     end
 })
 
--- No Lag Hub button
 MainTab:AddButton({
     Name = "No Lag hub",
     Callback = function()
@@ -52,56 +45,113 @@ MainTab:AddButton({
     end
 })
 
--- Server Hop Button
 MainTab:AddButton({
-    Name = "Server Hop (Auto-Exec UI + Speed Hub)",
+    Name = "ThunderZ hub",
     Callback = function()
-        local HttpService = game:GetService("HttpService")
-        local TeleportService = game:GetService("TeleportService")
-        local Players = game:GetService("Players")
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua'))()
+    end
+})
 
-        -- Auto-reload scripts on teleport
-        queue_on_teleport([[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/Melbinablond/Kiyo-Script-Hub/refs/heads/main/Kiyo%20Script%20Hub"))()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
-        ]])
+MainTab:AddButton({
+    Name = "Lynacy hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/1c1979f776d3e81869cf5f49f91900a7.lua"))()
+    end
+})
 
-        -- Find available servers
-        local function serverHop()
-            local gameId = game.PlaceId
-            local servers = {}
-            local req = syn and syn.request or http_request or request
+MainTab:AddButton({
+    Name = "Than hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/thantzy/thanhub/refs/heads/main/thanv1"))()
+    end
+})
 
-            if not req then
-                warn("Your executor does not support HTTP requests.")
-                return
-            end
+-- Toggle UI button (for mobile)
+MainTab:AddButton({
+    Name = "Toggle UI",
+    Callback = function()
+        local CoreGui = game:GetService("CoreGui")
+        local OrionUI = CoreGui:FindFirstChild("Orion")
+        if OrionUI then
+            OrionUI.Enabled = not OrionUI.Enabled
+        end
+    end
+})
 
-            local success, response = pcall(function()
-                return req({
-                    Url = string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", gameId)
-                })
-            end)
+-- Auto Server Hop Setup
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
 
-            if success and response and response.Body then
-                local data = HttpService:JSONDecode(response.Body)
-                if data and data.data then
-                    for _, server in ipairs(data.data) do
-                        if server.playing < server.maxPlayers and server.id ~= game.JobId then
-                            table.insert(servers, server.id)
-                        end
-                    end
-                end
-            end
+local function ServerHop()
+    local PlaceID = game.PlaceId
+    local JobID = game.JobId
+    local servers = {}
 
-            if #servers > 0 then
-                TeleportService:TeleportToPlaceInstance(gameId, servers[math.random(1, #servers)], Players.LocalPlayer)
-            else
-                warn("No available servers to hop to.")
+    local req = syn and syn.request or http_request or request
+    if not req then warn("Exploit doesn't support HTTP requests!") return end
+
+    local success, result = pcall(function()
+        return req({
+            Url = string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", PlaceID)
+        })
+    end)
+
+    if success and result and result.Body then
+        local data = HttpService:JSONDecode(result.Body)
+        for _, server in pairs(data.data) do
+            if server.playing < server.maxPlayers and server.id ~= JobID then
+                table.insert(servers, server.id)
             end
         end
+    end
 
-        serverHop()
+    if #servers > 0 then
+        setclipboard('loadstring(game:HttpGet("https://pastebin.com/raw/YOUR_EXEC_URL"))()') -- Optional autoexec reminder
+        TeleportService:TeleportToPlaceInstance(PlaceID, servers[math.random(1, #servers)], Players.LocalPlayer)
+    else
+        warn("No available servers found.")
+    end
+end
+
+-- Add manual Server Hop button
+MainTab:AddButton({
+    Name = "Manual Server Hop",
+    Callback = function()
+        ServerHop()
+    end
+})
+
+-- Auto Server Hop Toggle
+local AutoHopEnabled = false
+local AutoHopDelay = 60
+
+MainTab:AddDropdown({
+    Name = "Auto Hop Delay",
+    Default = "60s",
+    Options = { "30s", "60s", "90s", "120s" },
+    Callback = function(Value)
+        local num = tonumber(Value:match("%d+"))
+        if num then AutoHopDelay = num end
+    end
+})
+
+MainTab:AddToggle({
+    Name = "Enable Auto Server Hop",
+    Default = false,
+    Callback = function(Value)
+        AutoHopEnabled = Value
+        if AutoHopEnabled then
+            task.spawn(function()
+                while AutoHopEnabled do
+                    task.wait(AutoHopDelay)
+                    pcall(function()
+                        loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+                        ServerHop()
+                    end)
+                end
+            end)
+        end
     end
 })
 
