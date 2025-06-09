@@ -8,7 +8,7 @@ local Window = OrionLib:MakeWindow({
     ConfigFolder = "NatHubConfig"
 })
 
--- Create main tab
+-- Main tab
 local MainTab = Window:MakeTab({
     Name = "Grow a Garden",
     Icon = "rbxassetid://4483345998",
@@ -19,56 +19,15 @@ MainTab:AddSection({
     Name = "Scripts"
 })
 
-MainTab:AddButton({
-    Name = "NatHub",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"))()
-    end
-})
+MainTab:AddButton({Name = "NatHub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"))() end})
+MainTab:AddButton({Name = "Speed hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))() end})
+MainTab:AddButton({Name = "Lunor hub", Callback = function() loadstring(game:HttpGet('https://lunor.dev/loader'))() end})
+MainTab:AddButton({Name = "No Lag hub", Callback = function() loadstring(game:HttpGet("https://rawscripts.net/raw/Grow-a-Garden-NoLag-Hub-no-key-38699"))() end})
+MainTab:AddButton({Name = "ThunderZ hub", Callback = function() loadstring(game:HttpGet('https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua'))() end})
+MainTab:AddButton({Name = "Lynacy hub", Callback = function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/1c1979f776d3e81869cf5f49f91900a7.lua"))() end})
+MainTab:AddButton({Name = "Than hub", Callback = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/thantzy/thanhub/refs/heads/main/thanv1"))() end})
 
-MainTab:AddButton({
-    Name = "Speed hub",
-    Callback = function()
-       loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
-    end
-})
-
-MainTab:AddButton({
-    Name = "Lunor hub",
-    Callback = function()
-        loadstring(game:HttpGet('https://lunor.dev/loader'))()
-    end
-})
-
-MainTab:AddButton({
-    Name = "No Lag hub",
-    Callback = function()
-        loadstring(game:HttpGet("https://rawscripts.net/raw/Grow-a-Garden-NoLag-Hub-no-key-38699"))()
-    end
-})
-
-MainTab:AddButton({
-    Name = "ThunderZ hub",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/GaG/Main.lua"))()
-    end
-})
-
-MainTab:AddButton({
-    Name = "Lynacy hub",
-    Callback = function()
-        loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/1c1979f776d3e81869cf5f49f91900a7.lua"))()
-    end
-})
-
-MainTab:AddButton({
-    Name = "Than hub",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/thantzy/thanhub/refs/heads/main/thanv1"))()
-    end
-})
-
--- Local Player Section
+-- Local Player tab
 local LocalTab = Window:MakeTab({
     Name = "Local Player",
     Icon = "rbxassetid://4483345998",
@@ -79,7 +38,6 @@ LocalTab:AddSection({
     Name = "Player Modifiers"
 })
 
--- Walk Speed Changer
 LocalTab:AddTextbox({
     Name = "Walk Speed",
     Default = "16",
@@ -92,7 +50,6 @@ LocalTab:AddTextbox({
     end
 })
 
--- Jump Power Changer
 LocalTab:AddTextbox({
     Name = "Jump Power",
     Default = "50",
@@ -105,11 +62,9 @@ LocalTab:AddTextbox({
     end
 })
 
--- No Clip Toggle
+-- No Clip
 local noclipEnabled = false
-local RunService = game:GetService("RunService")
-
-RunService.Stepped:Connect(function()
+game:GetService("RunService").Stepped:Connect(function()
     if noclipEnabled and game.Players.LocalPlayer.Character then
         for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
             if part:IsA("BasePart") then
@@ -132,11 +87,9 @@ LocalTab:AddToggle({
     end
 })
 
--- Infinite Jump Toggle
+-- Infinite Jump
 local infJumpEnabled = false
-local UserInputService = game:GetService("UserInputService")
-
-UserInputService.JumpRequest:Connect(function()
+game:GetService("UserInputService").JumpRequest:Connect(function()
     if infJumpEnabled and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
         game.Players.LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
     end
@@ -155,5 +108,117 @@ LocalTab:AddToggle({
     end
 })
 
--- Initialize the UI
+-- Server Hop Manual
+LocalTab:AddButton({
+    Name = "Server Hop",
+    Callback = function()
+        local HttpService = game:GetService("HttpService")
+        local TeleportService = game:GetService("TeleportService")
+        local Players = game:GetService("Players")
+
+        queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Melbinablond/Kiyo-Script-Hub/refs/heads/main/Kiyo%20Script%20Hub"))()]]) -- CHANGE THIS
+
+        local function serverHop()
+            local gameId = game.PlaceId
+            local servers = {}
+            local req = syn and syn.request or http_request or request
+            if not req then return end
+
+            local success, response = pcall(function()
+                return req({
+                    Url = string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", gameId)
+                })
+            end)
+
+            if success and response and response.Body then
+                local data = HttpService:JSONDecode(response.Body)
+                for _, server in pairs(data.data or {}) do
+                    if server.playing < server.maxPlayers and server.id ~= game.JobId then
+                        table.insert(servers, server.id)
+                    end
+                end
+            end
+
+            if #servers > 0 then
+                TeleportService:TeleportToPlaceInstance(gameId, servers[math.random(1, #servers)], Players.LocalPlayer)
+            end
+        end
+
+        serverHop()
+    end
+})
+
+-- Auto Server Hop
+local AutoHopEnabled = false
+local AutoHopDelay = 30
+
+LocalTab:AddDropdown({
+    Name = "Auto Server Hop Delay",
+    Default = "30 Seconds",
+    Options = {"30 Seconds", "1 Minute"},
+    Callback = function(Value)
+        if Value == "30 Seconds" then
+            AutoHopDelay = 30
+        elseif Value == "1 Minute" then
+            AutoHopDelay = 60
+        end
+    end
+})
+
+LocalTab:AddToggle({
+    Name = "Auto Server Hop",
+    Default = false,
+    Callback = function(Value)
+        AutoHopEnabled = Value
+        if Value then
+            OrionLib:MakeNotification({
+                Name = "Auto Server Hop",
+                Content = "Enabled - Every " .. AutoHopDelay .. "s",
+                Time = 3
+            })
+            task.spawn(function()
+                while AutoHopEnabled do
+                    task.wait(AutoHopDelay)
+                    if not AutoHopEnabled then break end
+
+                    queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/YourUser/YourRepo/main/your-ui.lua"))()]]) -- CHANGE THIS
+
+                    local HttpService = game:GetService("HttpService")
+                    local TeleportService = game:GetService("TeleportService")
+                    local Players = game:GetService("Players")
+                    local gameId = game.PlaceId
+                    local servers = {}
+                    local req = syn and syn.request or http_request or request
+
+                    local success, response = pcall(function()
+                        return req({
+                            Url = string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", gameId)
+                        })
+                    end)
+
+                    if success and response and response.Body then
+                        local data = HttpService:JSONDecode(response.Body)
+                        for _, server in pairs(data.data or {}) do
+                            if server.playing < server.maxPlayers and server.id ~= game.JobId then
+                                table.insert(servers, server.id)
+                            end
+                        end
+                    end
+
+                    if #servers > 0 then
+                        TeleportService:TeleportToPlaceInstance(gameId, servers[math.random(1, #servers)], Players.LocalPlayer)
+                    end
+                end
+            end)
+        else
+            OrionLib:MakeNotification({
+                Name = "Auto Server Hop",
+                Content = "Disabled",
+                Time = 3
+            })
+        end
+    end
+})
+
+-- Init
 OrionLib:Init()
